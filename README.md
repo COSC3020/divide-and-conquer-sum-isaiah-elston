@@ -30,21 +30,19 @@ most important part. Add your answer to this markdown file.
 
 ```javascript
 
-function divideAndConquerSum(a) {
-    if (a.length == 0) { // T(1) = 1
+function divideAndConquerSum (a) {
+    if (a.length <= 0) {
         return 0; // T(1) = 1
-    } else if (a.length > 1) { // T(1) = 1
-        let netSum = 0; // T(1) = 1
+    } else if (a.length > 1) {
         let firstThird = Math.floor(a.length * (1/3)); // T(1) = 1
-        let finalThird = Math.floor(a.length * (2/3)); // T(1) = 1
-        return netSum += divideAndConquerSum(a.slice(0, firstThird--)) + // T(n/3)
-                         divideAndConquerSum(a.slice(firstThird, finalThird)) + // T(n/3)
-                         divideAndConquerSum(a.slice(finalThird++, a.length)); // T(n/3)
-    } else if (a.length == 1) {  // T(1) = 1
+        let secondThird = Math.floor(a.length * (2/3));// T(1) = 1
+        return divideAndConquerSum(a.slice(0, firstThird)) + // T(n/3)
+               divideAndConquerSum(a.slice(firstThird++, secondThird)) + // T(n/3)
+               divideAndConquerSum(a.slice(secondThird++, a.length)); // T(n/3)
+    } else if (a.length == 1) {
         return a[0]; // T(1) = 1
     }
 }
-
 ```
 
 ### Recurrence Relation
@@ -52,7 +50,7 @@ function divideAndConquerSum(a) {
 $$
 \mathrm{T}(n) = \begin{cases}
 1 & \text{if} & n \leq 1 \\
-3\mathrm{T}(\frac{n}{3}) + 4 & \text{if} & n > 1
+3\mathrm{T}(\frac{n}{3}) + 2 & \text{if} & n > 1
 \end{cases}
 $$
 
@@ -62,25 +60,27 @@ The only non-constant steps in my implementation are the recursive calls that di
 
 $$
 \begin{align}
-& \mathrm{T}(n) = 3\mathrm{T}(\frac{n}{3}) + 4 \\
-\implies & \mathrm{T}(n) = 3(3\mathrm{T}(\frac{n}{9}) + \frac{4}{3}) + 4 \\
-\implies & \mathrm{T}(n) = 9\mathrm{T}(\frac{n}{9}) + 8 \\
-\implies & \mathrm{T}(n) = 9(3\mathrm{T}(\frac{n}{27}) + 4) + 8 \\
-\implies & \mathrm{T}(n) = 27\mathrm{T}(\frac{n}{27}) + 12 \\
-\vdots   & \\
-\implies & \mathrm{T}(n) = 3^{i}\mathrm{T}(\frac{n}{3^{i}}) + 4i \\
+& \mathrm{T}(n) = 3\mathrm{T}(\frac{n}{3}) + 2 \\
+\implies & \mathrm{T}(n) = 3(3\mathrm{T}(\frac{n}{9}) + \frac{2}{3}) + 2 \\
+\implies & \mathrm{T}(n) = 9\mathrm{T}(\frac{n}{9}) + 4 \\
+\implies & \mathrm{T}(n) = 9(3\mathrm{T}(\frac{n}{27}) + 2) + 4 \\
+\implies & \mathrm{T}(n) = 27\mathrm{T}(\frac{n}{27}) + 6 \\
+& \vdots    \\
+\implies & \mathrm{T}(n) = 3^{i}\mathrm{T}(\frac{n}{3^{i}}) + 2i \\
 \end{align}
 $$
 
-Now that I have a generalized pattern for the recurrence relation I can determine that, based on an arbitrary input size "$n$," the amount of steps required to reach the base case of $n \leq 1$ will always be $\log_{3}(n)$. The reason it is $\log_{3}(n)$ is because the recursive division of the input array can be modeled as a ternary tree where the height is the number of steps it takes to get from the initial length "$n$" to either $n = 1$ or $n = 0$.
+Now that I have a generalized pattern for the recurrence relation I can determine that, based on an arbitrary input size "$n$," the amount of steps required to reach the base case of $n \leq 1$ will always be $\log_{3}(n)$. The reason it is $\log_{3}(n)$ is because the recursive division of the input array can be modeled as a ternary tree where the height of the tree represents the number of steps it takes to get from the initial length "$n$" to either $n = 1$ or $n = 0$.
 
 Now, let's substitute $i$ with $\log_{3}(n)$ to finish deriving the $\Theta$ runtime bound...
 
 $$
 \begin{align}
-\implies & \mathrm{T}(n) = 3^{\log_{3}(n)}\mathrm{T}(\frac{n}{3^{\log_{3}(n)}}) + 4\log_{3}(n) \\
-\implies & \mathrm{T}(n) = 3^{\log_{3}(n)}(1) + 4\log_{3}(n) \\
-\implies & \mathrm{T}(n) = n(1) + 4\log_{3}(n) \\
+\implies & \mathrm{T}(n) = 3^{\log_{3}(n)}\mathrm{T}(\frac{n}{3^{\log_{3}(n)}}) + 2\log_{3}(n) \\
+\implies & \mathrm{T}(n) = 3^{\log_{3}(n)}(1) + 2\log_{3}(n) \\
+\implies & \mathrm{T}(n) = n(1) + 2\log_{3}(n) \\
 \implies & \mathrm{T}(n) \in \mathrm{\Theta}(n)
 \end{align}
 $$
+
+Since the fastest growing term will always be $n$, we can drop off the other term(s) since they're asymptotically negligible, and thus concur that $\mathrm{T}(n) \in \mathrm{\Theta}(n)$.
